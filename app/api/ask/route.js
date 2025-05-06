@@ -7,25 +7,51 @@ const openai = new OpenAI({
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const prompt = formData.get("prompt") || "";
+    const rawPrompt = formData.get("prompt") || "";
     const files = formData.getAll("media");
 
     const fileMetas = [];
+    let prompt = rawPrompt;
 
     for (const file of files) {
-      const uploaded = await openai.files.create({
-        file,
-        purpose: "assistants"
-      });
-      fileMetas.push({
-        id: uploaded.id,
-        name: file.name || "без имени",
-        type: file.type || "application/octet-stream"
-      });
+      const ext = file.name?.split(".").pop()?.toLowerCase() || "";
+      const mime = file.type || "application/octet-stream";
+
+      // 🎙️ Если это аудиофайл — расшифровываем через Whisper
+      if (["mp3", "wav", "webm", "m4a", "ogg"].includes(ext)) {
+        const audioForm = new FormData();
+        audioForm.append("file", file, file.name);
+        audioForm.append("model", "whisper-1");
+
+        const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+          },
+          body: audioForm
+        });
+
+        const result = await response.json();
+
+        if (result?.text) {
+          prompt += `\n\n[🎙️ Голосовое сообщение]: ${result.text}`;
+        }
+      } else {
+        // Загружаем обычные файлы
+        const uploaded = await openai.files.create({
+          file,
+          purpose: "assistants"
+        });
+
+        fileMetas.push({
+          id: uploaded.id,
+          name: file.name || "без имени",
+          type: mime
+        });
+      }
     }
 
     const thread = await openai.beta.threads.create();
-
     const content = [];
 
     if (prompt.trim() !== "") {
@@ -49,7 +75,6 @@ export async function POST(req) {
       }
     }
 
-    // Если вообще ничего нет — ошибка
     if (content.length === 0) {
       return new Response(
         JSON.stringify({ error: "Заполните сообщение или прикрепите файл." }),
@@ -67,7 +92,7 @@ export async function POST(req) {
     });
 
     while (run.status !== "completed" && run.status !== "failed") {
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
       const updated = await openai.beta.threads.runs.retrieve(thread.id, run.id);
       run.status = updated.status;
     }
