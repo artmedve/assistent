@@ -20,25 +20,25 @@ export async function POST(req) {
       fileIds.push(uploaded.id);
     }
 
+    // Создаём поток
     const thread = await openai.beta.threads.create();
 
-    const content = [
-      { type: "text", text: prompt },
-      ...fileIds.map(id => ({
-        type: "file_id",
-        file_id: id
-      }))
-    ];
-
+    // Отправляем сообщение + файлы через tool_resources
     await openai.beta.threads.messages.create(thread.id, {
       role: "user",
-      content
+      content: [{ type: "text", text: prompt }],
+      tool_resources: {
+        file_search: { file_ids: fileIds },
+        code_interpreter: { file_ids: fileIds }
+      }
     });
 
+    // Запускаем выполнение
     const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: process.env.ASSISTANT_ID
     });
 
+    // Ждём завершения
     while (run.status !== "completed" && run.status !== "failed") {
       await new Promise(r => setTimeout(r, 1000));
       const updated = await openai.beta.threads.runs.retrieve(thread.id, run.id);
