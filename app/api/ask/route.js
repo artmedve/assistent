@@ -7,33 +7,33 @@ const openai = new OpenAI({
 export async function POST(req) {
   try {
     const formData = await req.formData();
-    const prompt = formData.get("prompt");
+    const prompt = formData.get("prompt") || "";
     const files = formData.getAll("media");
 
-    const fileIds = [];
     const fileMetas = [];
 
-    // Загружаем каждый файл
     for (const file of files) {
       const uploaded = await openai.files.create({
         file,
         purpose: "assistants"
       });
-      fileIds.push(uploaded.id);
       fileMetas.push({
         id: uploaded.id,
-        name: file.name,
-        type: file.type
+        name: file.name || "без имени",
+        type: file.type || "application/octet-stream"
       });
     }
 
-    // Создаём thread
     const thread = await openai.beta.threads.create();
 
-    // Формируем content
-    const content = [
-      { type: "text", text: prompt }
-    ];
+    const content = [];
+
+    if (prompt.trim() !== "") {
+      content.push({
+        type: "text",
+        text: prompt.trim()
+      });
+    }
 
     for (const meta of fileMetas) {
       if (meta.type.startsWith("image/")) {
@@ -49,25 +49,29 @@ export async function POST(req) {
       }
     }
 
-    // Создаём сообщение в thread
+    // Если вообще ничего нет — ошибка
+    if (content.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Заполните сообщение или прикрепите файл." }),
+        { status: 400 }
+      );
+    }
+
     await openai.beta.threads.messages.create(thread.id, {
       role: "user",
       content
     });
 
-    // Запускаем ассистента
     const run = await openai.beta.threads.runs.create(thread.id, {
       assistant_id: process.env.ASSISTANT_ID
     });
 
-    // Ждём завершения
     while (run.status !== "completed" && run.status !== "failed") {
-      await new Promise((r) => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 1000));
       const updated = await openai.beta.threads.runs.retrieve(thread.id, run.id);
       run.status = updated.status;
     }
 
-    // Получаем ответ
     const messages = await openai.beta.threads.messages.list(thread.id);
     const reply = messages.data[0].content[0].text.value;
 
