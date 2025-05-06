@@ -20,11 +20,19 @@ export async function POST(req) {
 
   const thread = await openai.beta.threads.create();
 
-  await openai.beta.threads.messages.create(thread.id, {
-    role: "user",
-    content: prompt,
-    file_ids: fileIds
-  });
+const content = [
+  { type: "text", text: prompt },
+  ...fileIds.map(id => ({
+    type: "file_id",
+    file_id: id
+  }))
+];
+
+await openai.beta.threads.messages.create(thread.id, {
+  role: "user",
+  content
+});
+
 
   const run = await openai.beta.threads.runs.create(thread.id, {
     assistant_id: process.env.ASSISTANT_ID
