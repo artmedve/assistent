@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>История 5 класс — Верования и искусство</title>
+<style>
+:root{--ink:#17324d;--blue:#2d6fa3;--blue2:#eaf4fb;--line:#d8e5ef;--ok:#eaf8ef;--okb:#65ad7c;--bad:#fff0ed;--badb:#d67369;--bg:#f5f8fb;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#213547;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}.wrap{max-width:780px;margin:0 auto;padding:20px}.hero{padding:10px 2px 18px}.tag{display:inline-block;background:#fff3c9;color:#704f00;border-radius:999px;padding:7px 11px;font-weight:700;font-size:13px}.hero h1{font-size:28px;line-height:1.15;color:var(--ink);margin:12px 0 6px}.hero p{margin:0;color:#617487}.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 10px 30px rgba(31,59,87,.07)}.meta{display:flex;justify-content:space-between;gap:12px;font-size:14px;color:#6b7f91;margin-bottom:10px}.bar{height:9px;background:#e8eef4;border-radius:20px;overflow:hidden;margin-bottom:20px}.fill{height:100%;background:var(--blue);width:10%;transition:.25s}.q{font-size:22px;line-height:1.3;color:var(--ink);margin:0 0 18px}.opt{display:block;width:100%;text-align:left;border:1px solid #cfdce7;background:#fff;border-radius:14px;padding:14px 15px;margin:9px 0;font-size:16px;line-height:1.35;cursor:pointer}.opt:hover{border-color:#90b7d2;background:#f8fbfd}.opt:disabled{cursor:default;color:#213547}.opt.correct{background:var(--ok);border-color:var(--okb)}.opt.wrong{background:var(--bad);border-color:var(--badb)}.feedback{margin-top:15px;border-radius:14px;padding:13px 14px;line-height:1.4}.feedback.ok{background:var(--ok);border:1px solid var(--okb)}.feedback.bad{background:var(--bad);border:1px solid var(--badb)}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.btn{border:0;border-radius:13px;padding:12px 16px;font-weight:750;font-size:15px;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:#eef4f8;color:var(--ink)}.hide{display:none}.score{font-size:42px;font-weight:800;color:var(--ink);margin:4px 0}.result h2{color:var(--ink);font-size:26px;margin:4px 0 8px}.mistakes{margin-top:18px}.mistake{border-top:1px solid var(--line);padding:13px 0}.mistake b{color:var(--ink)}.foot{font-size:12px;color:#7c8b98;text-align:center;margin:14px 0 0}.note{background:#eef6fb;border-radius:14px;padding:12px 14px;margin:0 0 18px;color:#38556c;font-size:14px}
+@media(max-width:600px){.wrap{padding:14px}.hero h1{font-size:24px}.card{padding:17px}.q{font-size:19px}.opt{font-size:15px}.score{font-size:36px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <span class="tag">Бесплатная самопроверка</span>
+    <h1>История · 5 класс<br>«Верования и искусство»</h1>
+    <p>По учебнику В. Р. Мединского и А. О. Чубарьяна, стр. 24–28. 10 вопросов.</p>
+  </div>
+
+  <div id="quiz" class="card">
+    <div class="note">Сначала ответь без подсказки. После выбора сразу увидишь короткое объяснение.</div>
+    <div class="meta"><span id="progressText">Вопрос 1 из 10</span><span id="liveScore">0 правильных</span></div>
+    <div class="bar"><div id="fill" class="fill"></div></div>
+    <h2 id="question" class="q"></h2>
+    <div id="options"></div>
+    <div id="feedback" class="feedback hide"></div>
+    <div class="actions"><button id="next" class="btn primary hide">Следующий вопрос</button></div>
+  </div>
+
+  <div id="result" class="card result hide">
+    <h2>Готово!</h2>
+    <div id="score" class="score"></div>
+    <p id="resultText"></p>
+    <div id="mistakes" class="mistakes"></div>
+    <div class="actions">
+      <button class="btn primary" onclick="restart()">Пройти ещё раз</button>
+      <button class="btn secondary" onclick="shareQuiz()">Поделиться тестом</button>
+    </div>
+  </div>
+  <p class="foot">Тест работает прямо в браузере. Регистрация не нужна.</p>
+</div>
+<script>
+const Q=[
+ {q:'Сколько лет примерно наскальным росписям пещеры Альтамира?',o:['Около 7 тысяч лет','Около 17 тысяч лет','Около 27 тысяч лет','Около 40 тысяч лет'],a:1,e:'В учебнике указано, что цветные росписи Альтамиры созданы первобытным человеком около 17 тысяч лет назад.'},
+ {q:'Где найден древнейший календарь, которому около 24 тысяч лет?',o:['На стоянке Мальта под Иркутском','В пещере Альтамира в Испании','В Залавруге в Карелии','В Каповой пещере в Башкирии'],a:0,e:'Календарь возрастом около 24 тысяч лет найден на стоянке Мальта под Иркутском.'},
+ {q:'Какой возраст календаря со стоянки Мезин близ Чернигова указан в учебнике?',o:['Около 15 тысяч лет','Около 20 тысяч лет','Около 24 тысяч лет','IV–III тысячелетия до н. э.'],a:1,e:'Для стоянки Мезин указан возраст около 20 тысяч лет.'},
+ {q:'Какой временной промежуток относится к древнему календарю со стоянки Гонцы?',o:['30–25 тысяч лет назад','24–20 тысяч лет назад','15–10 тысяч лет назад','8–5 тысяч лет назад'],a:2,e:'Учебник указывает для стоянки Гонцы 15–10 тысяч лет назад.'},
+ {q:'Какими знаниями владел первобытный человек?',o:['Умел читать и писать','Знал повадки животных, свойства растений и простейшие способы лечения','Пользовался компасом и картами','Знал устройство государств и законов'],a:1,e:'Первобытные люди различали следы и повадки животных, знали лечебные растения и умели оказывать простейшую помощь при ранениях.'},
+ {q:'Как первобытные люди считали до десяти?',o:['По зарубкам на металле','По звёздам','Загибая пальцы рук','С помощью письменных цифр'],a:2,e:'До десяти считали, загибая пальцы рук; для больших чисел могли использовать и пальцы ног.'},
+ {q:'Что в учебнике называется магией в первобытном обществе?',o:['Только украшение оружия орнаментом','Вера в особые действия, обряды и заклинания для общения с духами и воздействия на события','Любое знание о природе','Название первых календарей'],a:1,e:'Магию связывали с особыми приёмами — обрядами, жертвоприношениями и заклинаниями — и верой в возможность общения с духами и воздействия на события.'},
+ {q:'Для чего служили святилища?',o:['Для хранения добычи','Для проведения религиозных обрядов','Для постоянного проживания племени','Для изготовления каменных орудий'],a:1,e:'Святилища были специальными местами для религиозных обрядов; они могли быть природными или рукотворными.'},
+ {q:'Где в России найдены более тысячи петроглифов с изображениями людей, животных, лодок, охоты и ритуалов?',o:['На берегах Онежского озера и в Залавруге в Карелии','Только в Каповой пещере','На стоянке Мальта','В Альтамире'],a:0,e:'Учебник называет берега Онежского озера и Залавругу в Карелии. Эти петроглифы датируют IV–III тысячелетиями до н. э.'},
+ {q:'Кто первым увидел знаменитые многоцветные изображения бизонов в Альтамире?',o:['Джеймс Фрезер','Марселино де Саутуола','Девятилетняя Мария де Саутуола','Зденек Буриан'],a:2,e:'Девятилетняя Мария де Саутуола прошла вглубь пещеры и увидела изображения бизонов. Её отец Марселино в 1879 году исследовал находки у входа в Альтамиру.'}
+];
+let i=0,score=0,locked=false,wrong=[];
+const qEl=document.getElementById('question'),oEl=document.getElementById('options'),fb=document.getElementById('feedback'),next=document.getElementById('next'),fill=document.getElementById('fill'),pt=document.getElementById('progressText'),ls=document.getElementById('liveScore');
+function render(){locked=false;pt.textContent=`Вопрос ${i+1} из ${Q.length}`;ls.textContent=`${score} правильных`;fill.style.width=`${((i+1)/Q.length)*100}%`;qEl.textContent=Q[i].q;oEl.innerHTML='';fb.className='feedback hide';next.className='btn primary hide';Q[i].o.forEach((txt,j)=>{const b=document.createElement('button');b.className='opt';b.textContent=txt;b.onclick=()=>answer(j,b);oEl.appendChild(b);});}
+function answer(j,b){if(locked)return;locked=true;[...oEl.children].forEach(x=>x.disabled=true);const correct=Q[i].a;[...oEl.children][correct].classList.add('correct');if(j===correct){score++;fb.textContent='Верно. '+Q[i].e;fb.className='feedback ok';}else{b.classList.add('wrong');wrong.push({q:Q[i].q,y:Q[i].o[j],c:Q[i].o[correct]});fb.textContent='Пока нет. '+Q[i].e;fb.className='feedback bad';}ls.textContent=`${score} правильных`;next.className='btn primary';next.textContent=i===Q.length-1?'Показать результат':'Следующий вопрос';}
+next.onclick=()=>{i++;if(i<Q.length)render();else finish();};
+function finish(){document.getElementById('quiz').classList.add('hide');document.getElementById('result').classList.remove('hide');document.getElementById('score').textContent=`${score} / ${Q.length}`;const t=document.getElementById('resultText');t.textContent=score===10?'Отлично: тема усвоена очень уверенно.':score>=8?'Очень хорошо. Повтори только ошибки и даты.':score>=6?'Основа понятна, но стоит ещё раз пройти сложные места.':'Лучше ещё раз посмотреть материал и пройти тест повторно.';const m=document.getElementById('mistakes');if(!wrong.length){m.innerHTML='<p><b>Ошибок нет.</b> Можно переходить к устному ответу.</p>';}else{m.innerHTML='<h3>Что повторить</h3>'+wrong.map(x=>`<div class="mistake"><b>${x.q}</b><br>Твой ответ: ${x.y}<br>Правильно: ${x.c}</div>`).join('');}}
+function restart(){i=0;score=0;wrong=[];document.getElementById('result').classList.add('hide');document.getElementById('quiz').classList.remove('hide');render();window.scrollTo({top:0,behavior:'smooth'});}
+function shareQuiz(){const data={title:document.title,text:'Бесплатный тест по истории 5 класса: «Верования и искусство»',url:location.href};if(navigator.share){navigator.share(data).catch(()=>{});}else if(navigator.clipboard){navigator.clipboard.writeText(location.href).then(()=>alert('Ссылка скопирована'));}else{prompt('Скопируйте ссылку:',location.href);}}
+render();
+</script>
+</body>
+</html>
